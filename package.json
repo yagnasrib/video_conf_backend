@@ -1,0 +1,22 @@
+{
+  "name": "zego-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@zegocloud/zego-uikit-prebuilt": "^2.14.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jwt-simple": "^0.5.6",
+    "mongoose": "^8.10.0",
+    "zego-express-engine-webrtc": "^3.7.4"
+  }
+}
