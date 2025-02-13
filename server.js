@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 
 // CORS configuration allowing only the Vercel frontend link
-const FRONTEND_URL = "https://frontendvideo-call.vercel.app";
+const FRONTEND_URL = 'https://frontendvideo-call.vercel.app';
 
 const io = new Server(server, {
     cors: {
