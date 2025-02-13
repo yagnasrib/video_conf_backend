@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Token = require("../models/Token");
 
+const rooms = {}; // Temporary in-memory storage for hosts
+
 exports.generateToken = async (req, res) => {
   console.log("Received request:", req.body);
 
@@ -18,25 +20,20 @@ exports.generateToken = async (req, res) => {
       return res.status(500).json({ error: "Missing APP_ID or SERVER_SECRET in .env." });
     }
 
-    // Create the payload
     const payload = {
       app_id: appID,
       user_id: userID,
       room_id: roomID,
-      privilege: { "1": 1, "2": 1 }, // Allow Publish & Subscribe
-      exp: Math.floor(Date.now() / 1000) + 7200 // Token expires in 2 hours
+      privilege: { "1": 1, "2": 1 },
+      exp: Math.floor(Date.now() / 1000) + 7200,
     };
 
-    // Log the payload for debugging
     console.log("Generated Kit Token Payload:", payload);
 
-    // Generate the token using the payload and server secret
     const kitToken = jwt.sign(payload, serverSecret, { algorithm: "HS256" });
 
-    // Log the generated token for debugging
     console.log("Generated Kit Token:", kitToken);
 
-    // Save the token to the database
     const newToken = new Token({ roomID, userID, userName, kitToken });
 
     await newToken.save();
@@ -46,4 +43,23 @@ exports.generateToken = async (req, res) => {
     console.error("Token generation failed:", error);
     return res.status(500).json({ error: "Failed to generate token." });
   }
+};
+
+// ✅ Get the host of a room
+exports.getHost = (req, res) => {
+  const roomID = req.params.roomID;
+  res.json({ hostID: rooms[roomID]?.hostID || null });
+};
+
+// ✅ Set the host for a room
+exports.setHost = (req, res) => {
+  const roomID = req.params.roomID;
+  const { hostID } = req.body;
+
+  if (!rooms[roomID]) {
+    rooms[roomID] = { hostID };
+    console.log(`Host set for room ${roomID}: ${hostID}`);
+  }
+
+  res.json({ success: true, hostID: rooms[roomID].hostID });
 };
