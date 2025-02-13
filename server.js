@@ -6,13 +6,9 @@ const roomRoutes = require("./routes/roomRoutes");
 
 const app = express();
 const server = http.createServer(app);
-
-// CORS configuration allowing only the Vercel frontend link
-const FRONTEND_URL = 'https://frontendvideo-call.vercel.app';
-
 const io = new Server(server, {
     cors: {
-        origin: FRONTEND_URL, // Only allow the Vercel frontend link
+        origin: "*",
         methods: ["GET", "POST"]
     }
 });
