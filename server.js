@@ -20,7 +20,7 @@ mongoose
 
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:3001", // Update this with your frontend URL if different
+  origin: "https://frontendvideo-call-d6oi.vercel.app", // Update this with your frontend URL if different
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
