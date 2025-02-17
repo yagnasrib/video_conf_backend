@@ -6,28 +6,36 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const roomRoutes = require("./routes/roomRoutes");
 const authRoutes = require("./routes/authRoutes");
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
+
 
 const app = express();
 const server = http.createServer(app);
 
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
+
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:3001", // Update this with your frontend URL if different (use "*" for any origin)
+  origin: "http://localhost:3001", // Update this with your frontend URL if different
   methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"], // Optional: add any custom headers you may use
-  credentials: true, // Allow credentials such as cookies or HTTP authentication
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 const io = new Server(server, {
-  cors: corsOptions, // Apply CORS settings to Socket.io
+  cors: corsOptions,
 });
 
-app.use(cors(corsOptions)); // Apply CORS settings to the Express app
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api/rooms", roomRoutes);
 app.use("/api/auth", authRoutes);
 
-const rooms = {}; // Store room participants
+const rooms = {};
 
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
@@ -49,7 +57,6 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} joined room ${roomId}`);
     io.to(roomId).emit("room-update", rooms[roomId]);
 
-    // Notify when waiting for others
     if (rooms[roomId].length < 2) {
       io.to(roomId).emit("waiting", "Waiting for more participants...");
     } else {
@@ -59,7 +66,7 @@ io.on("connection", (socket) => {
 
   socket.on("leave-room", ({ roomId, userId }) => {
     if (rooms[roomId]) {
-      rooms[roomId] = rooms[roomId].filter(id => id !== userId);
+      rooms[roomId] = rooms[roomId].filter((id) => id !== userId);
       socket.leave(roomId);
       io.to(roomId).emit("room-update", rooms[roomId]);
     }
